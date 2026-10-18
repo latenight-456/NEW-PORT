@@ -1,0 +1,56 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 500 650" width="100%" height="100%" fill="none">
+  <!-- Hair & Head Base (Black) -->
+  <path d="M 125 240 C 120 120, 200 60, 250 60 C 300 60, 380 120, 375 240 C 375 270, 385 300, 385 340 C 385 430, 320 520, 250 520 C 180 520, 115 430, 115 340 C 115 300, 125 270, 125 240 Z" fill="#000000" />
+  
+  <!-- Face (White) -->
+  <path d="M 152 235 C 150 170, 190 145, 250 145 C 310 145, 350 170, 348 235 C 347 280, 358 360, 340 435 C 322 495, 275 510, 250 510 C 225 510, 178 495, 160 435 C 142 360, 153 280, 152 235 Z" fill="#ffffff" />
+
+  <!-- Forehead hairline -->
+  <path d="M 160 215 C 160 170, 200 152, 250 152 C 300 152, 340 170, 340 215 C 325 210, 305 212, 250 212 C 195 212, 175 210, 160 215 Z" fill="#000000" />
+
+  <!-- Ears -->
+  <!-- Left Ear -->
+  <path d="M 122 300 C 105 300, 105 370, 128 375 C 132 375, 138 340, 138 320 C 138 305, 130 300, 122 300 Z" fill="#ffffff" stroke="#000000" stroke-width="12" stroke-linecap="round" stroke-linejoin="round" />
+  <path d="M 122 320 C 116 325, 116 350, 124 355" stroke="#000000" stroke-width="8" stroke-linecap="round" fill="none" />
+  <!-- Right Ear -->
+  <path d="M 378 300 C 395 300, 395 370, 372 375 C 368 375, 362 340, 362 320 C 362 305, 370 300, 378 300 Z" fill="#ffffff" stroke="#000000" stroke-width="12" stroke-linecap="round" stroke-linejoin="round" />
+  <path d="M 378 320 C 384 325, 384 350, 376 355" stroke="#000000" stroke-width="8" stroke-linecap="round" fill="none" />
+
+  <!-- Eyebrows -->
+  <path d="M 172 232 C 185 218, 218 218, 236 230 C 220 225, 195 225, 172 232 Z" fill="#000000" />
+  <path d="M 328 232 C 315 218, 282 218, 264 230 C 280 225, 305 225, 328 232 Z" fill="#000000" />
+
+  <!-- Glasses Frame -->
+  <!-- Left Rim -->
+  <rect x="156" y="240" width="82" height="74" rx="24" fill="#ffffff" stroke="#000000" stroke-width="16" />
+  <!-- Right Rim -->
+  <rect x="262" y="240" width="82" height="74" rx="24" fill="#ffffff" stroke="#000000" stroke-width="16" />
+  <!-- Bridge -->
+  <path d="M 235 258 C 243 252, 257 252, 265 258" stroke="#000000" stroke-width="16" stroke-linecap="round" fill="none" />
+  <!-- Left/Right Temples extension -->
+  <path d="M 156 265 L 132 268" stroke="#000000" stroke-width="14" stroke-linecap="round" />
+  <path d="M 344 265 L 368 268" stroke="#000000" stroke-width="14" stroke-linecap="round" />
+
+  <!-- Eyes inside Glasses -->
+  <!-- Left Eye -->
+  <ellipse cx="197" cy="277" rx="14" ry="15" fill="#000000" />
+  <circle cx="193" cy="273" r="4.5" fill="#ffffff" />
+  <!-- Right Eye -->
+  <ellipse cx="303" cy="277" rx="14" ry="15" fill="#000000" />
+  <circle cx="299" cy="273" r="4.5" fill="#ffffff" />
+
+  <!-- Nose -->
+  <path d="M 236 325 C 235 342, 222 346, 230 354 C 238 360, 262 360, 270 354 C 278 346, 265 342, 264 325" fill="#000000" stroke="#000000" stroke-width="6" stroke-linejoin="round" />
+  <path d="M 242 350 C 246 352, 254 352, 258 350" stroke="#ffffff" stroke-width="4" stroke-linecap="round" />
+
+  <!-- Mustache -->
+  <path d="M 205 388 C 220 380, 240 378, 250 384 C 260 378, 280 380, 295 388 C 285 396, 265 398, 250 392 C 235 398, 215 396, 205 388 Z" fill="#000000" />
+
+  <!-- Mouth Line -->
+  <path d="M 232 414 C 242 418, 258 418, 268 414" stroke="#000000" stroke-width="5" stroke-linecap="round" />
+
+  <!-- Goatee / Beard on Chin -->
+  <path d="M 242 426 L 258 426 L 254 442 L 246 442 Z" fill="#000000" />
+  <path d="M 230 452 C 240 448, 260 448, 270 452 C 275 468, 266 490, 250 495 C 234 490, 225 468, 230 452 Z" fill="#000000" />
+  <path d="M 215 470 C 235 506, 265 506, 285 470 C 290 492, 275 514, 250 514 C 225 514, 210 492, 215 470 Z" fill="#000000" />
+</svg>

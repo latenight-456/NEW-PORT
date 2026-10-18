@@ -1,0 +1,6 @@
+{
+  "name": "Latenight Studio Hero",
+  "description": "Richy's Late Night Studio hero section with interactive pill toggling, doodle hint, and animated DESIGN artwork.",
+  "requestFramePermissions": [],
+  "majorCapabilities": ["MAJOR_CAPABILITY_SERVER_SIDE_GEMINI_API"]
+}

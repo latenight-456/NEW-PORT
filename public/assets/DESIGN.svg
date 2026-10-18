@@ -1,0 +1,115 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 1050 240" width="100%" height="auto" fill="none">
+  <defs>
+    <!-- Filter for subtle organic edge -->
+    <filter id="softGlow" x="-5%" y="-5%" width="110%" height="110%">
+      <feDropShadow dx="0" dy="0" stdDeviation="1.5" flood-color="#ff3b0a" flood-opacity="0.35"/>
+    </filter>
+  </defs>
+
+  <g stroke="#ff3b0a" stroke-width="3.5" stroke-linecap="round" stroke-linejoin="round" fill="#1e1e1e" filter="url(#softGlow)">
+    
+    <!-- D -->
+    <g id="letter-D">
+      <path d="M 35 15 C 20 15, 12 28, 12 45 L 12 195 C 12 212, 20 225, 35 225 L 95 225 C 135 225, 155 185, 155 120 C 155 55, 135 15, 95 15 Z
+               M 52 55 L 85 55 C 105 55, 118 80, 118 120 C 118 160, 105 185, 85 185 L 52 185 Z" fill-rule="evenodd" />
+      <!-- Speckles in D -->
+      <g fill="#ff3b0a" stroke="none">
+        <circle cx="28" cy="40" r="3" />
+        <circle cx="34" cy="75" r="2.5" />
+        <circle cx="24" cy="110" r="3.2" />
+        <circle cx="32" cy="145" r="2.8" />
+        <circle cx="25" cy="180" r="3" />
+        <circle cx="34" cy="205" r="2" />
+        <circle cx="68" cy="32" r="3.5" />
+        <circle cx="102" cy="42" r="2.8" />
+        <circle cx="132" cy="85" r="3.2" />
+        <circle cx="138" cy="122" r="2.5" />
+        <circle cx="130" cy="160" r="3.5" />
+        <circle cx="108" cy="202" r="2.6" />
+        <circle cx="68" cy="208" r="3" />
+      </g>
+    </g>
+
+    <!-- E -->
+    <g id="letter-E">
+      <path d="M 215 15 C 200 15, 192 28, 192 45 L 192 195 C 192 212, 200 225, 215 225 L 310 225 C 322 225, 330 216, 330 205 C 330 194, 322 185, 310 185 L 235 185 L 235 138 L 290 138 C 302 138, 310 130, 310 120 C 310 110, 302 102, 290 102 L 235 102 L 235 55 L 310 55 C 322 55, 330 46, 330 35 C 330 24, 322 15, 310 15 Z" />
+      <!-- Speckles in E -->
+      <g fill="#ff3b0a" stroke="none">
+        <circle cx="210" cy="40" r="3" />
+        <circle cx="215" cy="80" r="2.5" />
+        <circle cx="206" cy="120" r="3.2" />
+        <circle cx="214" cy="160" r="2.6" />
+        <circle cx="208" cy="200" r="3.4" />
+        <circle cx="260" cy="35" r="2.8" />
+        <circle cx="295" cy="35" r="3" />
+        <circle cx="262" cy="120" r="2.6" />
+        <circle cx="260" cy="205" r="3.2" />
+        <circle cx="295" cy="205" r="2.8" />
+      </g>
+    </g>
+
+    <!-- S -->
+    <g id="letter-S">
+      <path d="M 470 30 C 455 16, 425 15, 400 22 C 375 30, 365 48, 365 72 C 365 110, 410 115, 435 125 C 460 135, 472 148, 472 170 C 472 195, 452 225, 415 225 C 385 225, 365 210, 355 195 C 348 185, 356 175, 368 178 C 378 181, 395 190, 415 190 C 432 190, 442 180, 442 168 C 442 145, 400 138, 375 128 C 352 118, 338 102, 338 72 C 338 42, 365 15, 412 15 C 438 15, 460 22, 478 35 C 488 42, 480 52, 470 48 Z" />
+      <!-- Speckles in S -->
+      <g fill="#ff3b0a" stroke="none">
+        <circle cx="410" cy="32" r="3" />
+        <circle cx="445" cy="40" r="2.5" />
+        <circle cx="372" cy="65" r="3.2" />
+        <circle cx="395" cy="98" r="2.7" />
+        <circle cx="425" cy="132" r="3.5" />
+        <circle cx="452" cy="165" r="2.8" />
+        <circle cx="430" cy="205" r="3.1" />
+        <circle cx="390" cy="210" r="2.4" />
+      </g>
+    </g>
+
+    <!-- I -->
+    <g id="letter-I">
+      <rect x="525" y="15" width="40" height="210" rx="20" />
+      <!-- Speckles in I -->
+      <g fill="#ff3b0a" stroke="none">
+        <circle cx="545" cy="42" r="3.2" />
+        <circle cx="544" cy="78" r="2.5" />
+        <circle cx="546" cy="115" r="3" />
+        <circle cx="543" cy="155" r="2.7" />
+        <circle cx="545" cy="195" r="3.3" />
+      </g>
+    </g>
+
+    <!-- G -->
+    <g id="letter-G">
+      <path d="M 725 35 C 708 20, 680 15, 650 15 C 605 15, 575 50, 575 120 C 575 190, 605 225, 655 225 C 695 225, 725 205, 730 165 C 732 152, 722 145, 710 145 L 665 145 C 655 145, 648 152, 648 162 C 648 172, 655 182, 665 182 L 690 182 C 685 192, 672 198, 655 198 C 625 198, 608 175, 608 120 C 608 65, 625 42, 652 42 C 675 42, 695 52, 712 68 C 720 75, 730 70, 725 58 Z" />
+      <!-- Speckles in G -->
+      <g fill="#ff3b0a" stroke="none">
+        <circle cx="650" cy="30" r="3" />
+        <circle cx="685" cy="42" r="2.6" />
+        <circle cx="600" cy="68" r="3.2" />
+        <circle cx="594" cy="120" r="2.8" />
+        <circle cx="598" cy="172" r="3.1" />
+        <circle cx="640" cy="210" r="2.5" />
+        <circle cx="678" cy="210" r="3.4" />
+        <circle cx="712" cy="175" r="2.8" />
+      </g>
+    </g>
+
+    <!-- N -->
+    <g id="letter-N">
+      <path d="M 795 15 C 782 15, 775 25, 775 40 L 775 198 C 775 212, 782 225, 795 225 C 808 225, 818 215, 822 200 L 880 75 L 880 198 C 880 212, 888 225, 902 225 C 915 225, 924 212, 924 198 L 924 40 C 924 25, 915 15, 902 15 C 890 15, 880 25, 874 42 L 818 165 L 818 40 C 818 25, 808 15, 795 15 Z" />
+      <!-- Speckles in N -->
+      <g fill="#ff3b0a" stroke="none">
+        <circle cx="796" cy="45" r="3" />
+        <circle cx="794" cy="95" r="2.6" />
+        <circle cx="795" cy="145" r="3.2" />
+        <circle cx="796" cy="195" r="2.7" />
+        <circle cx="835" cy="85" r="3.1" />
+        <circle cx="852" cy="125" r="2.8" />
+        <circle cx="868" cy="165" r="3.3" />
+        <circle cx="904" cy="45" r="2.9" />
+        <circle cx="903" cy="95" r="3.2" />
+        <circle cx="904" cy="145" r="2.6" />
+        <circle cx="903" cy="195" r="3.4" />
+      </g>
+    </g>
+  </g>
+</svg>
