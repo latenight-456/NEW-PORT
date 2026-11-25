@@ -1,0 +1,661 @@
+# AI Studio prompt: Services, dot-matrix heading, Work, nav
+
+Copy everything below the line into Google AI Studio (Build) as one message.
+
+---
+
+Make these 5 changes. Do not change any other section, and do not add npm packages or animation libraries.
+
+**General rule for the 3 components below:** create each file and paste the code **exactly as written**. Do not rewrite, restyle, convert to Tailwind or rename classes. In each file's `CSS` string, the only lines you may edit are `--lns-display` (set it to the exact `font-family` the site already uses for big headings) and `--lns-body` (the site's body font). For dark mode, add overrides for the colour variables (`--lns-paper`, `--lns-ink`, `--lns-muted`, `--lns-line`, and in Services also `--lns-hover-bg`, `--lns-hover-fg`) using the selector the site already uses for its dark theme. Keep red `#ed1d04`.
+
+## 1. Navbar
+Change the nav link text "Our Work" to "My Work". Keep its href, active underline and styling.
+
+## 2. Services
+Create `components/ServicesSection.tsx` with the code below. Delete the old Services cards (Web Design & Dev / Mobile Applications / AI Products & Agents) and render `<ServicesSection />` in the same place, inside the existing rounded panel. It keeps `id="services"` for the nav link.
+
+```tsx
+import React from "react";
+
+/* Late Night Studio: Services section.
+   Self-contained: styles are injected below, no Tailwind or extra packages needed.
+   Only edit the SERVICES array and the two font variables in the CSS. */
+
+type IconType = "web" | "systems" | "brand" | "print";
+
+type Service = {
+  id: string;
+  title: string;
+  description: string;
+  tags: string[];
+  href: string;
+  icon: IconType;
+};
+
+const SERVICES: Service[] = [
+  {
+    id: "01",
+    title: "Websites",
+    description:
+      "Custom websites designed and built around your business, fast on every device and easy to keep up to date.",
+    tags: ["Business sites", "E-commerce", "Landing pages"],
+    href: "#contact",
+    icon: "web",
+  },
+  {
+    id: "02",
+    title: "Systems",
+    description:
+      "Business management systems for bookings, stock, staff and customers, built around how your team already works.",
+    tags: ["Dashboards", "Bookings & inventory", "Automations"],
+    href: "#contact",
+    icon: "systems",
+  },
+  {
+    id: "03",
+    title: "Branding",
+    description:
+      "Logos, names and visual identities, with the guidelines and files to use them the same way everywhere.",
+    tags: ["Logo design", "Visual identity", "Brand guidelines"],
+    href: "#contact",
+    icon: "brand",
+  },
+  {
+    id: "04",
+    title: "Graphic design",
+    description:
+      "Flyers, banners, posters, social media graphics and event materials, designed for print and screen.",
+    tags: ["Flyers", "Banners", "Social media graphics"],
+    href: "#contact",
+    icon: "print",
+  },
+];
+
+const Icon = ({ type }: { type: IconType }) => {
+  if (type === "web")
+    return (
+      <svg className="lns-icon i-web" viewBox="0 0 120 90" aria-hidden="true">
+        <rect className="s" x="8" y="10" width="104" height="70" rx="8" />
+        <path className="s" d="M8 26h104" />
+        <circle className="r" cx="19" cy="18" r="3" />
+        <rect className="r bar" x="22" y="38" width="76" height="7" rx="3.5" />
+        <rect className="r bar" x="22" y="52" width="60" height="7" rx="3.5" opacity=".75" />
+        <rect className="r bar" x="22" y="66" width="44" height="7" rx="3.5" opacity=".5" />
+      </svg>
+    );
+  if (type === "systems")
+    return (
+      <svg className="lns-icon i-sys" viewBox="0 0 120 90" aria-hidden="true">
+        <rect className="s" x="8" y="8" width="104" height="74" rx="8" />
+        <path className="s" d="M34 8v74M16 22h10M16 32h10M16 42h10" />
+        <path className="s" d="M44 70h58" />
+        <rect className="r col c1" x="48" y="40" width="10" height="30" />
+        <rect className="s col c2" x="64" y="30" width="10" height="40" />
+        <rect className="r col c3" x="80" y="48" width="10" height="22" />
+        <circle className="r dot" cx="102" cy="20" r="4" />
+      </svg>
+    );
+  if (type === "brand")
+    return (
+      <svg className="lns-icon i-brand" viewBox="0 0 120 90" aria-hidden="true">
+        <rect className="s" x="64" y="6" width="40" height="56" rx="4" />
+        <circle className="r" cx="84" cy="26" r="10" />
+        <g className="s">
+          <rect x="70" y="70" width="8" height="8" />
+          <rect x="81" y="70" width="8" height="8" />
+          <rect x="92" y="70" width="8" height="8" />
+        </g>
+        <g className="card">
+          <rect className="s paper" x="12" y="34" width="70" height="42" rx="3" />
+          <rect className="r" x="20" y="43" width="16" height="12" />
+          <path className="s" d="M44 46h28M44 54h20M20 66h50" />
+        </g>
+      </svg>
+    );
+  return (
+    <svg className="lns-icon i-print" viewBox="0 0 120 90" aria-hidden="true">
+      <g className="flap l">
+        <rect className="s paper" x="17" y="10" width="28" height="72" />
+        <path className="s" d="M23 22h16M23 31h16M23 40h16" />
+        <rect className="r" x="23" y="52" width="16" height="14" />
+      </g>
+      <g>
+        <rect className="s paper" x="45" y="6" width="30" height="80" />
+        <circle className="s" cx="60" cy="34" r="8" />
+        <circle className="r" cx="60" cy="34" r="3" />
+        <path className="s" d="M51 56h18M51 64h18" />
+      </g>
+      <g className="flap r-flap">
+        <rect className="s paper" x="75" y="10" width="28" height="72" />
+        <path className="s" d="M81 22h16M81 31h16M81 40h16M81 49h16M81 58h10" />
+      </g>
+    </svg>
+  );
+};
+
+const Arrow = () => (
+  <svg className="lns-arrow" viewBox="0 0 24 24" aria-hidden="true">
+    <path d="M5 19L19 5M8 5h11v11" fill="none" stroke="currentColor" strokeWidth="2.2" strokeLinecap="round" strokeLinejoin="round" />
+  </svg>
+);
+
+export default function ServicesSection() {
+  return (
+    <section id="services" className="lns-services" aria-labelledby="lns-services-title">
+      <style>{CSS}</style>
+      <header className="lns-services__head">
+        <h2 id="lns-services-title" className="lns-services__title">SERVICES.</h2>
+        <p className="lns-services__intro">
+          Websites and systems for businesses of every kind, with branding and graphic design when you need them.
+        </p>
+      </header>
+      <ul className="lns-list">
+        {SERVICES.map((s) => (
+          <li key={s.id}>
+            <a className="lns-row" href={s.href}>
+              <span className="lns-num">{s.id}</span>
+              <h3 className="lns-name">{s.title}</h3>
+              <Icon type={s.icon} />
+              <div className="lns-body">
+                <p>{s.description}</p>
+                <ul className="lns-tags">
+                  {s.tags.map((t) => (
+                    <li key={t}>{t}</li>
+                  ))}
+                </ul>
+              </div>
+              <Arrow />
+            </a>
+          </li>
+        ))}
+      </ul>
+    </section>
+  );
+}
+
+const CSS = `
+.lns-services{
+  --lns-paper:#cdc9c3;      /* sampled from your site */
+  --lns-ink:#28272a;        /* sampled: text + page frame */
+  --lns-red:#ed1d04;        /* sampled: CTA + icon accent */
+  --lns-muted:#5e5a57;
+  --lns-line:rgba(40,39,42,.22);
+  --lns-hover-bg:var(--lns-ink);   /* swap to var(--lns-red) for a louder hover */
+  --lns-hover-fg:var(--lns-paper);
+  --lns-display:inherit;           /* = your heading font */
+  --lns-body:inherit;              /* = your body font */
+  --lns-ease:cubic-bezier(.22,.61,.36,1);
+  --lns-shift:20px;
+  max-width:1180px;margin:0 auto;padding:96px 24px;color:var(--lns-ink);font-family:var(--lns-body);
+}
+.lns-services__head{text-align:center;margin-bottom:56px}
+.lns-services__title{font-family:var(--lns-display);font-size:clamp(40px,6vw,64px);line-height:1;margin:0 0 16px;letter-spacing:.02em}
+.lns-services__intro{max-width:540px;margin:0 auto;font-size:16px;line-height:1.6;color:var(--lns-muted)}
+.lns-list{list-style:none;margin:0;padding:0;border-top:1px solid var(--lns-line)}
+.lns-list > li{border-bottom:1px solid var(--lns-line)}
+
+.lns-row{position:relative;isolation:isolate;display:grid;
+  grid-template-columns:72px minmax(0,1fr) 150px minmax(0,340px) 48px;
+  gap:0 24px;align-items:start;padding:40px 24px 40px 8px;
+  color:inherit;text-decoration:none;border-radius:20px;
+  transition:color .3s var(--lns-ease)}
+.lns-row::before{content:"";position:absolute;inset:6px 0;z-index:-1;border-radius:20px;
+  background:var(--lns-hover-bg);opacity:0;transform:scaleY(.92);
+  transition:opacity .3s var(--lns-ease),transform .4s var(--lns-ease)}
+.lns-num{font-family:var(--lns-display);font-size:14px;padding-top:12px;padding-left:16px;transition:transform .35s var(--lns-ease)}
+.lns-name{font-family:var(--lns-display);font-size:clamp(28px,3.4vw,42px);line-height:1.05;letter-spacing:.02em;margin:0;transition:transform .35s var(--lns-ease)}
+.lns-icon{width:120px;height:90px;justify-self:center;transition:transform .45s var(--lns-ease)}
+.lns-body p{margin:0;font-size:15px;line-height:1.65;color:var(--lns-muted);transition:color .3s var(--lns-ease)}
+.lns-tags{display:flex;flex-wrap:wrap;gap:6px;margin-top:14px;padding:0;list-style:none}
+.lns-tags li{font-size:12px;padding:4px 10px;border:1px solid var(--lns-line);border-radius:999px;transition:border-color .3s,color .3s}
+.lns-arrow{width:24px;height:24px;justify-self:end;margin-top:8px;transition:transform .35s var(--lns-ease)}
+
+/* hover + keyboard focus share one state */
+.lns-row:is(:hover,:focus-visible){color:var(--lns-hover-fg)}
+.lns-row:is(:hover,:focus-visible)::before{opacity:1;transform:scaleY(1)}
+.lns-row:is(:hover,:focus-visible) .lns-num,
+.lns-row:is(:hover,:focus-visible) .lns-name{transform:translateX(var(--lns-shift))}
+.lns-row:is(:hover,:focus-visible) .lns-arrow{transform:translate(calc(var(--lns-shift)*-1),0) rotate(45deg)}
+.lns-row:is(:hover,:focus-visible) .lns-icon{transform:rotate(-5deg) scale(1.06)}
+.lns-row:is(:hover,:focus-visible) .lns-body p{color:var(--lns-hover-fg);opacity:.85}
+.lns-row:is(:hover,:focus-visible) .lns-tags li{border-color:rgba(205,201,195,.35)}
+.lns-row:focus-visible{outline:2px solid var(--lns-red);outline-offset:2px}
+
+/* icon base: strokes follow text colour, so they invert on hover for free */
+.lns-icon .s{fill:none;stroke:currentColor;stroke-width:2.4;stroke-linecap:round;stroke-linejoin:round}
+.lns-icon .s.paper{fill:var(--lns-paper);transition:fill .3s var(--lns-ease)}
+.lns-row:is(:hover,:focus-visible) .lns-icon .s.paper{fill:var(--lns-hover-bg)}
+.lns-icon .r{fill:var(--lns-red)}
+
+/* 01 Websites: content bars load in red, one after another */
+.i-web .bar{transform-box:fill-box;transform-origin:left center;transform:scaleX(.35);transition:transform .45s var(--lns-ease)}
+.i-web .bar:nth-of-type(2){transition-delay:.06s}.i-web .bar:nth-of-type(3){transition-delay:.12s}
+.lns-row:is(:hover,:focus-visible) .i-web .bar{transform:scaleX(1)}
+
+/* 02 Systems: dashboard columns re-rank, status light blinks */
+.i-sys .col{transform-box:fill-box;transform-origin:center bottom;transition:transform .5s cubic-bezier(.34,1.56,.64,1)}
+.i-sys .c2{transition-delay:.06s}.i-sys .c3{transition-delay:.12s}
+.lns-row:is(:hover,:focus-visible) .i-sys .c1{transform:scaleY(1.5)}
+.lns-row:is(:hover,:focus-visible) .i-sys .c2{transform:scaleY(.6)}
+.lns-row:is(:hover,:focus-visible) .i-sys .c3{transform:scaleY(1.9)}
+.lns-row:is(:hover,:focus-visible) .i-sys .dot{animation:lns-blink 1s steps(2) infinite}
+@keyframes lns-blink{50%{opacity:0}}
+
+/* 03 Branding: business card tilts out from the badge */
+.i-brand .card{transform-box:fill-box;transform-origin:bottom left;transition:transform .45s var(--lns-ease)}
+.lns-row:is(:hover,:focus-visible) .i-brand .card{transform:rotate(-9deg) translate(-4px,4px)}
+
+/* 04 Graphic design: tri-fold flyer folds shut */
+.i-print .flap{transform-box:fill-box;transition:transform .5s var(--lns-ease)}
+.i-print .flap.l{transform-origin:right center}
+.i-print .flap.r-flap{transform-origin:left center}
+.lns-row:is(:hover,:focus-visible) .i-print .flap{transform:scaleX(0)}
+
+/* touch devices have no hover: show the active look on tap instead */
+@media (hover:none){.lns-row:active::before{opacity:1;transform:scaleY(1)}.lns-row:active{color:var(--lns-hover-fg)}}
+
+@media (max-width:820px){
+  .lns-services{padding:64px 16px;--lns-shift:6px}
+  .lns-row{grid-template-columns:36px minmax(0,1fr) 32px;gap:12px;padding:28px 12px 28px 0}
+  .lns-num{padding-left:8px;padding-top:6px}
+  .lns-icon{grid-column:2;grid-row:2;justify-self:start;width:84px;height:64px}
+  .lns-body{grid-column:2;grid-row:3}
+  .lns-arrow{grid-column:3;grid-row:1}
+}
+@media (prefers-reduced-motion:reduce){.lns-services *,.lns-services *::before{transition:none!important;animation:none!important}}
+`;
+```
+
+## 3. "I'M YOUR PERSON TO GET SH*T DONE" heading
+Create `components/DotMatrixHeading.tsx` with the code below. Replace the current dot-matrix heading and the paragraph under it with `<DotMatrixHeading id="about" />` inside the existing rounded panel, and remove the old dot-matrix animation code completely. Use whatever id the nav "About" link targets. For dark mode, override `--lns-ink` and `--lns-muted`.
+
+```tsx
+import React, { useEffect, useRef } from "react";
+
+/* Late Night Studio: scroll-driven dot-matrix heading.
+   The section is tall and the heading stays pinned while you scroll through it.
+   Scroll position IS the timeline: scrolling down plays it forward, scrolling up plays it backward.
+   0.00 to 0.35  dots appear left to right while the heading is ~2.2x size
+   0.15 to 0.55  heading shrinks to its normal size
+   0.50 to 0.90  solid letters wipe in line by line with a slanted edge; dots behind the wipe disappear
+   0.85 to 1.00  paragraph fades up
+   Dots are sampled from the heading's real font, so they sit exactly under the solid letters.
+   No libraries. */
+
+type Props = {
+  lines?: string[];
+  body?: string;
+  id?: string;
+  /** scroll length of the effect, in screen heights (higher = slower) */
+  length?: number;
+};
+
+type Dot = { x: number; y: number; d: number; line: number };
+
+const SCALE_FROM = 2.2;
+const DOTS = [0, 0.35];
+const SHRINK = [0.15, 0.55];
+const WIPE = [0.5, 0.9];
+const BODY = [0.85, 1];
+const EDGE_EM = 0.6; // slant of the wipe edge, in em
+
+const ease = (k: number) => (k < 0.5 ? 4 * k * k * k : 1 - Math.pow(-2 * k + 2, 3) / 2);
+const clamp01 = (v: number) => Math.min(1, Math.max(0, v));
+const range = (p: number, [a, b]: number[]) => clamp01((p - a) / (b - a));
+
+export default function DotMatrixHeading({
+  lines = ["I'M YOUR PERSON", "TO GET SH*T DONE"],
+  body = "I design and build digital products, combining frontend engineering with interactive design. Away from that work, music, photography, gaming and GOD are parts of my life, too.",
+  id,
+  length = 2.5,
+}: Props) {
+  const sectionRef = useRef<HTMLElement>(null);
+  const stageRef = useRef<HTMLDivElement>(null);
+  const titleRef = useRef<HTMLHeadingElement>(null);
+  const canvasRef = useRef<HTMLCanvasElement>(null);
+  const bodyRef = useRef<HTMLParagraphElement>(null);
+
+  useEffect(() => {
+    const section = sectionRef.current!;
+    const stage = stageRef.current!;
+    const title = titleRef.current!;
+    const canvas = canvasRef.current!;
+    const bodyEl = bodyRef.current!;
+    const ctx = canvas.getContext("2d")!;
+    const spans = Array.from(title.querySelectorAll<HTMLSpanElement>(".lns-dm__line"));
+    const reduce = window.matchMedia("(prefers-reduced-motion: reduce)").matches;
+
+    let dots: Dot[] = [];
+    let radius = 2;
+    let edgePx = 40;
+    let ink = "#28272a";
+    let raf = 0;
+    let cancelled = false;
+
+    const sample = () => {
+      const W = title.offsetWidth;
+      const H = title.offsetHeight;
+      const dpr = Math.min(window.devicePixelRatio || 1, 2);
+      canvas.width = Math.round(W * dpr);
+      canvas.height = Math.round(H * dpr);
+      canvas.style.width = W + "px";
+      canvas.style.height = H + "px";
+      ctx.setTransform(dpr, 0, 0, dpr, 0, 0);
+
+      const cs = getComputedStyle(title);
+      ink = getComputedStyle(section).getPropertyValue("--lns-ink").trim() || cs.color;
+      const fontSize = parseFloat(cs.fontSize);
+      const pitch = Math.max(3, fontSize * 0.062);
+      radius = pitch * 0.36;
+      edgePx = fontSize * EDGE_EM;
+
+      const off = document.createElement("canvas");
+      off.width = Math.ceil(W);
+      off.height = Math.ceil(H);
+      const o = off.getContext("2d", { willReadFrequently: true })!;
+      o.fillStyle = "#000";
+      o.textBaseline = "alphabetic";
+      dots = [];
+      spans.forEach((s, li) => {
+        o.clearRect(0, 0, off.width, off.height);
+        const ss = getComputedStyle(s);
+        o.font = `${ss.fontStyle} ${ss.fontWeight} ${ss.fontSize} ${ss.fontFamily}`;
+        if ("letterSpacing" in o) (o as any).letterSpacing = ss.letterSpacing;
+        const m = o.measureText(s.textContent || "");
+        const asc = m.fontBoundingBoxAscent ?? m.actualBoundingBoxAscent;
+        const desc = m.fontBoundingBoxDescent ?? m.actualBoundingBoxDescent;
+        const baseline = s.offsetTop + (s.offsetHeight - (asc + desc)) / 2 + asc;
+        o.fillText(s.textContent || "", s.offsetLeft, baseline);
+        const data = o.getImageData(0, 0, off.width, off.height).data;
+        for (let y = pitch / 2; y < H; y += pitch) {
+          for (let x = pitch / 2; x < W; x += pitch) {
+            const i = (Math.floor(y) * off.width + Math.floor(x)) * 4 + 3;
+            // stable pseudo-random per dot, so scrolling back and forth looks identical
+            const r = Math.abs(Math.sin(x * 12.9898 + y * 78.233) * 43758.5453) % 1;
+            if (data[i] > 140) dots.push({ x, y, d: (x / W) * 0.7 + r * 0.3, line: li });
+          }
+        }
+      });
+    };
+
+    const lineWipe = (p: number, i: number) => {
+      const n = spans.length;
+      const [a, b] = WIPE;
+      const span = (b - a) / (1 + 0.35 * (n - 1)); // each line's share, overlapping
+      const start = a + i * span * 0.35;
+      return ease(clamp01((p - start) / span));
+    };
+
+    const render = (p: number) => {
+      const k = ease(range(p, SHRINK));
+      stage.style.transform = `scale(${SCALE_FROM + (1 - SCALE_FROM) * k})`;
+
+      const wipes = spans.map((_, i) => lineWipe(p, i));
+      spans.forEach((s, i) => s.style.setProperty("--w", wipes[i].toFixed(4)));
+
+      const W = title.offsetWidth;
+      const H = title.offsetHeight;
+      ctx.clearRect(0, 0, W, H);
+      ctx.fillStyle = ink;
+      const dp = range(p, DOTS);
+      for (const d of dots) {
+        const w = wipes[d.line];
+        if (w >= 1) continue; // line fully solid: no dots
+        if (w > 0) {
+          // hide dots the slanted edge has already passed
+          const s = spans[d.line];
+          const yRel = ((d.y - s.offsetTop) / s.offsetHeight + 0.1) / 1.2; // matches the -10%..110% clip-path
+          const edgeX = s.offsetLeft + w * (s.offsetWidth + edgePx) - edgePx * yRel;
+          if (d.x < edgeX) continue;
+        }
+        const a = clamp01((dp - d.d * 0.75) / 0.25);
+        if (a <= 0) continue;
+        ctx.globalAlpha = 0.6 * a;
+        ctx.beginPath();
+        ctx.arc(d.x, d.y, radius * (0.6 + 0.4 * a), 0, Math.PI * 2);
+        ctx.fill();
+      }
+      ctx.globalAlpha = 1;
+
+      const bo = range(p, BODY);
+      bodyEl.style.opacity = String(bo);
+      bodyEl.style.transform = `translateY(${16 * (1 - bo)}px)`;
+    };
+
+    const progress = () => {
+      const r = section.getBoundingClientRect();
+      const total = section.offsetHeight - window.innerHeight;
+      return total <= 0 ? 1 : clamp01(-r.top / total);
+    };
+
+    const update = () => {
+      raf = 0;
+      render(reduce ? 1 : progress());
+    };
+    const onScroll = () => {
+      if (!raf) raf = requestAnimationFrame(update);
+    };
+
+    const ro = new ResizeObserver(() => {
+      sample();
+      update();
+    });
+
+    document.fonts.ready.then(() => {
+      if (cancelled) return;
+      sample();
+      update();
+      ro.observe(title);
+      // capture:true also catches scrolling inside a container (smooth-scroll wrappers, overflow:auto mains)
+      document.addEventListener("scroll", onScroll, { passive: true, capture: true });
+      window.addEventListener("resize", onScroll);
+    });
+
+    return () => {
+      cancelled = true;
+      cancelAnimationFrame(raf);
+      ro.disconnect();
+      document.removeEventListener("scroll", onScroll, { capture: true });
+      window.removeEventListener("resize", onScroll);
+    };
+  }, [lines.join("|")]);
+
+  return (
+    <section
+      id={id}
+      ref={sectionRef}
+      className="lns-dm"
+      style={{ height: `${Math.max(1, length) * 100 + 100}vh` }}
+      aria-labelledby="lns-dm-title"
+    >
+      <style>{CSS}</style>
+      <div className="lns-dm__pin">
+        <div ref={stageRef} className="lns-dm__stage">
+          <canvas ref={canvasRef} className="lns-dm__dots" aria-hidden="true" />
+          <h2 ref={titleRef} id="lns-dm-title" className="lns-dm__title">
+            {lines.map((l) => (
+              <span key={l} className="lns-dm__line">
+                {l}
+              </span>
+            ))}
+          </h2>
+        </div>
+        <p ref={bodyRef} className="lns-dm__body">
+          {body}
+        </p>
+      </div>
+    </section>
+  );
+}
+
+const CSS = `
+.lns-dm{
+  --lns-ink:#28272a;
+  --lns-muted:#5e5a57;
+  --lns-display:inherit;   /* = the font your "I'M YOUR PERSON" heading uses now */
+  --lns-body:inherit;
+  position:relative;color:var(--lns-ink);font-family:var(--lns-body);text-align:center;
+}
+/* stays on screen while the section scrolls past; overflow:clip keeps the 2.2x text inside the panel */
+.lns-dm__pin{position:sticky;top:0;height:100vh;height:100svh;overflow:clip;
+  display:flex;flex-direction:column;align-items:center;justify-content:center;padding:0 16px}
+.lns-dm__stage{position:relative;transform-origin:50% 50%;will-change:transform}
+.lns-dm__dots{position:absolute;left:0;top:0;pointer-events:none}
+.lns-dm__title{position:relative;margin:0;font-family:var(--lns-display);font-weight:var(--lns-dm-weight,800);
+  font-size:clamp(34px,8vw,104px);line-height:1.02;letter-spacing:.01em}
+.lns-dm__line{--w:0;--edge:${EDGE_EM}em;display:block;width:fit-content;margin-inline:auto;white-space:nowrap;
+  clip-path:polygon(0 -10%, calc(var(--w) * (100% + var(--edge))) -10%, calc(var(--w) * (100% + var(--edge)) - var(--edge)) 110%, 0 110%)}
+.lns-dm__body{max-width:520px;margin:48px auto 0;font-size:17px;line-height:1.65;color:var(--lns-muted);opacity:0}
+@media (prefers-reduced-motion:reduce){.lns-dm{height:auto!important}.lns-dm__pin{position:static;height:auto;padding:96px 16px}}
+`;
+```
+
+The heading is now **scroll-driven**: the section is tall and the heading stays pinned while you scroll through it. Scrolling down plays the animation forward and scrolling up plays it backward. **Important:** `position: sticky` breaks inside any parent with `overflow: hidden` or `overflow: auto`. If the rounded panel (or any ancestor) around `<DotMatrixHeading />` has `overflow: hidden`, change it to `overflow: clip` for that panel. Do not wrap the component in anything with a fixed height.
+
+
+## 4. Work section
+Create `components/WorkInProgress.tsx` with the code below. Replace the current Work section ("Work / Coming next") with `<WorkInProgress />` inside the existing rounded panel. It has `id="work"`; make sure the nav "My Work" link points to `#work`.
+
+```tsx
+import React, { useEffect, useRef, useState } from "react";
+
+/* Late Night Studio: Work section placeholder (replaces "Coming next").
+   PROGRESS is a real number YOU update as case studies get finished. Keep it honest:
+   a bar stuck at 99% for months looks worse than no bar at all. */
+
+const PROGRESS = 60; // 0-100
+const BUILDING = [
+  { name: "Case study 01", status: "Writing" },
+  { name: "Case study 02", status: "Designing" },
+  { name: "Case study 03", status: "Planned" },
+];
+
+export default function WorkInProgress() {
+  const ref = useRef<HTMLElement>(null);
+  const [count, setCount] = useState(0);
+  const [started, setStarted] = useState(false);
+
+  useEffect(() => {
+    const el = ref.current;
+    if (!el) return;
+    if (window.matchMedia("(prefers-reduced-motion: reduce)").matches) {
+      setCount(PROGRESS);
+      setStarted(true);
+      return;
+    }
+    const io = new IntersectionObserver(
+      ([e]) => {
+        if (!e.isIntersecting) return;
+        io.disconnect();
+        setStarted(true);
+        const t0 = performance.now();
+        const dur = 1600;
+        const tick = (t: number) => {
+          const k = Math.min(1, (t - t0) / dur);
+          const eased = 1 - Math.pow(1 - k, 3);
+          setCount(Math.round(eased * PROGRESS));
+          if (k < 1) requestAnimationFrame(tick);
+        };
+        requestAnimationFrame(tick);
+      },
+      { threshold: 0.4 }
+    );
+    io.observe(el);
+    return () => io.disconnect();
+  }, []);
+
+  return (
+    <section id="work" ref={ref} className="lns-wip" aria-labelledby="lns-wip-title">
+      <style>{CSS}</style>
+      <h2 id="lns-wip-title" className="lns-wip__title">WORK.</h2>
+      <p className="lns-wip__status">
+        <span className="lns-wip__light" aria-hidden="true" /> Under construction
+      </p>
+
+      <div
+        className="lns-wip__meter"
+        role="progressbar"
+        aria-valuemin={0}
+        aria-valuemax={100}
+        aria-valuenow={PROGRESS}
+        aria-label="Case studies progress"
+      >
+        <div className="lns-wip__fill" style={{ width: started ? `${PROGRESS}%` : "0%" }} />
+      </div>
+      <p className="lns-wip__pct" aria-hidden="true">
+        {count}
+        <span>%</span>
+      </p>
+
+      <ul className="lns-wip__list">
+        {BUILDING.map((b) => (
+          <li key={b.name}>
+            <span>{b.name}</span>
+            <span className="lns-wip__tag">{b.status}</span>
+          </li>
+        ))}
+      </ul>
+
+      <p className="lns-wip__cta">
+        Want your project to be one of them? <a href="#contact">Let's talk</a>
+      </p>
+    </section>
+  );
+}
+
+const CSS = `
+.lns-wip{
+  --lns-paper:#cdc9c3;--lns-ink:#28272a;--lns-red:#ed1d04;--lns-muted:#5e5a57;--lns-line:rgba(40,39,42,.22);
+  --lns-display:inherit;--lns-body:inherit;
+  max-width:720px;margin:0 auto;padding:96px 24px;text-align:center;color:var(--lns-ink);font-family:var(--lns-body)}
+.lns-wip__title{font-family:var(--lns-display);font-size:clamp(40px,6vw,64px);line-height:1;margin:0 0 16px;letter-spacing:.02em}
+.lns-wip__status{display:inline-flex;align-items:center;gap:8px;margin:0 0 40px;font-size:14px;
+  padding:6px 14px;border:1px solid var(--lns-line);border-radius:999px}
+.lns-wip__light{width:8px;height:8px;border-radius:50%;background:var(--lns-red);animation:lns-wip-blink 1.2s steps(2) infinite}
+@keyframes lns-wip-blink{50%{opacity:.15}}
+
+/* construction-tape progress bar */
+.lns-wip__meter{height:22px;border-radius:999px;border:2px solid var(--lns-ink);overflow:hidden;background:transparent}
+.lns-wip__fill{height:100%;border-radius:999px;transition:width 1.6s cubic-bezier(.22,.61,.36,1);
+  background:repeating-linear-gradient(-45deg,var(--lns-red) 0 12px,var(--lns-ink) 12px 24px);
+  background-size:34px 34px;animation:lns-wip-tape 1s linear infinite}
+@keyframes lns-wip-tape{to{background-position:34px 0}}
+.lns-wip__pct{font-family:var(--lns-display);font-size:clamp(56px,10vw,112px);line-height:1;margin:20px 0 0;font-variant-numeric:tabular-nums}
+.lns-wip__pct span{font-size:.45em;margin-left:4px;color:var(--lns-red)}
+
+.lns-wip__list{list-style:none;margin:40px 0 0;padding:0;border-top:1px solid var(--lns-line);text-align:left}
+.lns-wip__list li{display:flex;justify-content:space-between;align-items:center;gap:12px;padding:16px 4px;border-bottom:1px solid var(--lns-line);font-size:16px}
+.lns-wip__tag{font-size:12px;padding:4px 10px;border:1px solid var(--lns-line);border-radius:999px;color:var(--lns-muted)}
+.lns-wip__cta{margin:32px 0 0;font-size:15px;color:var(--lns-muted)}
+.lns-wip__cta a{color:var(--lns-ink);font-weight:600;text-underline-offset:4px;text-decoration-color:var(--lns-red);text-decoration-thickness:2px}
+@media (prefers-reduced-motion:reduce){.lns-wip *{animation:none!important;transition:none!important}}
+`;
+```
+
+## 5. Rounded numbers
+Add rounded numerals across the whole site:
+1. Put this CSS in the global stylesheet (or a `<style>` in `index.html` `<head>`), exactly as written:
+
+```css
+/* Rounded numerals site-wide (Fredoka). unicode-range means this font is ONLY used for 0-9 and %,
+   so every other character keeps your existing fonts. */
+@font-face{
+  font-family:"LNS Numerals";
+  src:url("https://cdn.jsdelivr.net/npm/@fontsource/fredoka@5.2.10/files/fredoka-latin-400-normal.woff2") format("woff2");
+  font-weight:100 500;font-style:normal;font-display:swap;unicode-range:U+0030-0039,U+0025;
+}
+@font-face{
+  font-family:"LNS Numerals";
+  src:url("https://cdn.jsdelivr.net/npm/@fontsource/fredoka@5.2.10/files/fredoka-latin-600-normal.woff2") format("woff2");
+  font-weight:501 900;font-style:normal;font-display:swap;unicode-range:U+0030-0039,U+0025;
+}
+```
+
+2. Put `"LNS Numerals",` at the **front** of every `font-family` on the site: `body`, all headings, the nav, buttons, and the `--lns-display` / `--lns-body` values inside the components. Example: `font-family: "LNS Numerals", <existing fonts>;`. If the site uses Tailwind `fontFamily` config, add it as the first entry of each family there too.
+3. Don't change any other font. Only digits 0-9 and % should change; letters must look exactly as they do now.
+
+## Check after building
+- Services: hovering a row fills it dark, slides the number and title right, turns the arrow to point right, and plays that row's icon animation. Tab focus shows the same state with a red outline. At 390px wide, rows stack with no sideways scroll.
+- Heading: scrolling down, the heading stays pinned; large dots appear, shrink, then solid letters wipe in line by line with a slanted edge and no dots remain. Scrolling up reverses it exactly.
+- Numbers: every digit on the site (01-04, 60%) uses the rounded font. Letters are unchanged.
+- Work: the striped bar and number count up to 60% once, when the section scrolls into view.

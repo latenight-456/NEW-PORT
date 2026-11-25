@@ -1,0 +1,662 @@
+import React, { useEffect, useRef, useState } from "react";
+import { openContactOverlay } from "./ContactOverlay";
+import { MARK_D, MARK_VB } from "./ProcessBuild";
+
+/* Late Night Studio: the About section ("The studio").
+   1. Intro: name, short story, your photo.
+   2. A night in the studio: the section pins while you scroll and a room gets drawn in red blueprint lines,
+      one hour at a time, 22:00 to 04:00. Desk, lamp, the window onto Accra, the build on screen, music, done.
+   3. The road so far: a timeline that fills red as you scroll and ends on "Next up: your project".
+   4. What I stick to: four principles, each with a small drawing that plays when it comes into view.
+   Self-contained: styles injected below, no packages. Edit only the CONFIG block.
+   TIMELINE and CERTS come from your CV: keep them true. */
+
+/* ===================== CONFIG: edit these ===================== */
+const NAME = "Richy";
+const LEAD = "Designer in Accra with a marketer's head and a statistician's habits. I build things that look right and actually sell.";
+const STORY = [
+  "I'm the whole studio. The person you talk to on the first call is the person who designs it, builds it and hands it over. No account manager, no hand-offs.",
+  "By day I run marketing campaigns. By night I build. That's where the name comes from.",
+  "A statistics degree, years of CRM and shop-floor work, and design since 2014. So I don't just make it look good: I build it around how your business actually sells.",
+];
+const SIGNATURE = "Richy, Late night studio";
+const PHOTO = ""; // e.g. "/images/richy.jpg" (portrait, about 4:5). Empty shows a drawn placeholder frame.
+const PHOTO_ALT = "Richy at his desk";
+
+const NIGHT_EYEBROW = "A night in the studio";
+const STEPS: [string, string][] = [
+  // [title, line] — one per hour, 22:00 → 04:00
+  ["A room.", "Every build starts in the same room. Four walls, one desk, one person."],
+  ["A desk.", "No agency floor and no hand-offs. The person you talk to is the person who builds it."],
+  ["A lamp.", "The house is quiet by midnight. That's when the real work starts."],
+  ["A window.", "Accra outside, still awake. So am I."],
+  ["A build.", "Design and code on the same screen, by the same hands. Nothing lost in translation."],
+  ["Music.", "Something on in the background. Same beat, same focus, until it's right."],
+  ["Done.", "First light, and it's live. The next one could be yours."],
+];
+const TAGS = [
+  "Back wall · 3.6 × 2.7 m",
+  "Desk · 140 × 70 cm",
+  "Lamp · 2700 K",
+  "Window · Accra, still awake",
+  "Screen · design + code",
+  "Speaker · on repeat",
+  "Status · live",
+];
+
+const ROAD_TITLE = "The road so far.";
+// Your real history, oldest first (from your CV).
+const TIMELINE: { year: string; title: string; where?: string; text: string }[] = [
+  { year: "2014", title: "Graphic design", where: "Philips Training Institute", text: "Where it started: a certificate in graphic design, and I never stopped drawing." },
+  { year: "2017–21", title: "BSc Statistics", where: "KNUST", text: "Four years of numbers. It's why I build with data, not guesses." },
+  { year: "2019", title: "Intern", where: "Institute of African Studies, Legon · Yiri Lodge", text: "Records, sales dispatch and stock. First look at how a small operation really runs." },
+  { year: "2021–22", title: "Research assistant", where: "Ghana Cocoa Board · National Service", text: "Export reports and survey data for the STABEX programme. Accuracy over everything." },
+  { year: "2023–24", title: "CRM specialist", where: "Sunda International", text: "Set up and tuned CRM systems and trained the staff to use them. That's where the systems work started." },
+  { year: "2025", title: "Marketing specialist", where: "Softcare Ghana", text: "Campaigns across digital, social, email and print, with one brand kept consistent everywhere." },
+];
+const CERTS_TITLE = "Certificates";
+const CERTS: [string, string][] = [
+  // [course, from]
+  ["AI, Digital Marketing & Strategic Communications", "IDMC Ghana"],
+  ["Generative AI", "Google Cloud"],
+  ["CS50: Introduction to Information Technology", "Harvard University"],
+  ["Data Analytics with Excel", "Great Learning Academy"],
+  ["Frontend Development", ""],
+];
+const NEXT = "Next up: your project.";
+const CTA = "Let's talk";
+
+const RULES_TITLE = "What I stick to.";
+const RULES: [string, string][] = [
+  ["You talk to the builder.", "No middlemen. The person on the call is the person writing the code, so nothing gets lost on the way."],
+  ["Phones first.", "Most of your customers will see it on a phone. That's where it gets designed first, not squeezed in last."],
+  ["Not a template.", "Your business isn't anyone else's, so the site shouldn't be either. Built for you, from a blank page."],
+  ["Yours to keep.", "Domain, logins, files and code in your name. If we ever stop working together, you keep everything."],
+];
+/* =============================================================== */
+
+const VP = { x: 800, y: 380 };
+const W = { l: 520, r: 1080, t: 200, b: 560 }; // back wall
+const ext = (x: number, y: number) => {
+  const dx = x - VP.x, dy = y - VP.y;
+  const ts = [dx < 0 ? -VP.x / dx : dx > 0 ? (1600 - VP.x) / dx : 1e9, dy < 0 ? -VP.y / dy : dy > 0 ? (900 - VP.y) / dy : 1e9];
+  const t = Math.min(...ts);
+  return [VP.x + dx * t, VP.y + dy * t];
+};
+const ln = (x1: number, y1: number, x2: number, y2: number) => `M${x1} ${y1}L${x2} ${y2}`;
+const floorX = (y: number, side: -1 | 1) => (side < 0 ? W.l : W.r) + (y - W.b) * ((side < 0 ? W.l : W.r) - VP.x) / (W.b - VP.y);
+const at = (a: number, d = 0.45) => ({ ["--a" as any]: a, ["--d" as any]: d }) as React.CSSProperties;
+
+function Draw({ d, a, dd = 0.45, className = "" }: { d: string; a: number; dd?: number; className?: string }) {
+  return <path className={"ab-ln " + className} d={d} pathLength={1} style={at(a, dd)} />;
+}
+
+function Arrow() {
+  return (
+    <svg viewBox="0 0 16 16" aria-hidden="true">
+      <path d="M4.5 11.5l7-7M5.5 4.5h6v6" />
+    </svg>
+  );
+}
+
+/* the room, drawn by --p (0..7) */
+function Room() {
+  const corners: [number, number][] = [[W.l, W.t], [W.r, W.t], [W.l, W.b], [W.r, W.b]];
+  const grid: string[] = [];
+  for (let x = W.l + 70; x < W.r; x += 70) {
+    const [ex, ey] = ext(x, W.b);
+    grid.push(ln(x, W.b, ex, ey));
+  }
+  for (const y of [600, 655, 735, 850]) grid.push(ln(floorX(y, -1), y, floorX(y, 1), y));
+  const bars = Array.from({ length: 22 }, (_, i) => 18 + Math.abs(Math.sin(i * 1.7) * 52) + (i % 3) * 8);
+  return (
+    <svg className="lns-ab__room" viewBox="0 0 1600 900" preserveAspectRatio="xMidYMid slice" aria-hidden="true">
+      <defs>
+        <radialGradient id="abLamp" cx="50%" cy="0%" r="100%">
+          <stop offset="0" stopColor="#ffb36b" stopOpacity=".75" />
+          <stop offset="1" stopColor="#ffb36b" stopOpacity="0" />
+        </radialGradient>
+        <linearGradient id="abDawn" x1="0" y1="0" x2="0" y2="1">
+          <stop offset="0" stopColor="#3b3a52" />
+          <stop offset=".65" stopColor="#d98a6a" />
+          <stop offset="1" stopColor="#f2c79a" />
+        </linearGradient>
+        <clipPath id="abWin"><rect x="560" y="250" width="150" height="150" /></clipPath>
+        <clipPath id="abScr"><rect x="742" y="474" width="116" height="84" /></clipPath>
+      </defs>
+
+      {/* 22:00 a room */}
+      <g className="ab-guide">
+        {corners.map(([x, y], i) => {
+          return <Draw key={"v" + i} d={ln(VP.x, VP.y, x, y)} a={0.02 + i * 0.04} dd={0.3} className="ab-red" />;
+        })}
+      </g>
+      <circle className="ab-vp" cx={VP.x} cy={VP.y} r="6" style={at(0.05, 0.2)} />
+      <Draw d={`M${W.l} ${W.t}H${W.r}V${W.b}H${W.l}Z`} a={0.15} dd={0.5} className="ab-ink" />
+      {corners.map(([x, y], i) => {
+        const [ex, ey] = ext(x, y);
+        return <Draw key={"c" + i} d={ln(x, y, ex, ey)} a={0.3 + i * 0.05} dd={0.4} className="ab-ink" />;
+      })}
+      {grid.map((d, i) => (
+        <Draw key={"g" + i} d={d} a={0.45 + i * 0.02} dd={0.3} className="ab-faint" />
+      ))}
+
+      {/* 23:00 a desk */}
+      <Draw d="M640 548H960L1000 590H600Z" a={1.05} dd={0.4} className="ab-ink" />
+      <Draw d="M600 590V600H1000V590" a={1.3} dd={0.25} className="ab-ink" />
+      <Draw d="M614 600V712M986 600V712M652 548V640M948 548V640" a={1.4} dd={0.35} className="ab-ink" />
+
+      {/* 00:00 a lamp */}
+      <path className="ab-cone" d="M704 462L780 584H612Z" fill="url(#abLamp)" style={at(2.55, 0.3)} />
+      <Draw d="M648 572a22 5 0 1 0 44 0a22 5 0 1 0 -44 0" a={2.05} dd={0.2} className="ab-ink" />
+      <Draw d="M670 568L652 486L700 446" a={2.15} dd={0.25} className="ab-ink" />
+      <Draw d="M684 432L726 448L716 468L674 452Z" a={2.3} dd={0.2} className="ab-ink" />
+      <circle className="ab-bulb" cx="704" cy="462" r="5" style={at(2.5, 0.15)} />
+
+      {/* 01:00 a window onto Accra */}
+      <rect className="ab-sky" x="560" y="250" width="150" height="150" style={at(3.3, 0.3)} />
+      <rect className="ab-dawn" x="560" y="250" width="150" height="150" fill="url(#abDawn)" style={at(6.15, 0.55)} />
+      <g clipPath="url(#abWin)" className="ab-city" style={at(3.45, 0.3)}>
+        <circle className="ab-moon" cx="676" cy="282" r="10" />
+        <path className="ab-skyline" d="M560 400V352h14v-18h12v26h10v-38h16v30h8v-12h14v30h12v-46h18v40h10v-20h16v36h10V400Z" />
+        {[[576, 344], [590, 352], [604, 330], [620, 360], [640, 342], [658, 324], [662, 352], [686, 372], [700, 356]].map(([x, y], i) => (
+          <rect key={i} className="ab-lit" x={x} y={y} width="3" height="3" style={{ animationDelay: `${(i * 0.37) % 2.2}s` }} />
+        ))}
+      </g>
+      <Draw d="M560 250H710V400H560ZM635 250V400M560 325H710" a={3.05} dd={0.35} className="ab-ink" />
+
+      {/* 02:00 a build */}
+      <Draw d="M740 470H860V560H740Z" a={4.05} dd={0.3} className="ab-ink" />
+      <Draw d="M730 560H870L886 576H714Z" a={4.25} dd={0.2} className="ab-ink" />
+      <g clipPath="url(#abScr)">
+        <rect className="ab-scr" x="742" y="474" width="116" height="84" style={at(4.4, 0.2)} />
+        <Draw d="M750 486H790" a={4.45} dd={0.12} className="ab-red ab-thin" />
+        <Draw d="M750 498H820M750 506H808" a={4.55} dd={0.15} className="ab-ink ab-thin" />
+        <Draw d="M750 520H782V532H750Z" a={4.68} dd={0.15} className="ab-red ab-thin" />
+        <svg x="818" y="508" width="34" height="38" viewBox={MARK_VB}>
+          <path className="ab-mark" d={MARK_D} style={at(4.75, 0.25)} />
+        </svg>
+        <g className="ab-live" style={at(6.3, 0.35)}>
+          <rect x="742" y="474" width="116" height="84" className="ab-live__bg" />
+          <circle cx="768" cy="516" r="5" className="ab-live__dot" />
+          <text x="780" y="521" className="ab-live__t">Live</text>
+        </g>
+      </g>
+
+      {/* 03:00 music */}
+      <Draw d="M902 492H950V574H902Z" a={5.05} dd={0.25} className="ab-ink" />
+      <Draw d="M914 522a12 12 0 1 0 24 0a12 12 0 1 0 -24 0M920 556a6 6 0 1 0 12 0a6 6 0 1 0 -12 0" a={5.2} dd={0.25} className="ab-ink" />
+      <g className="ab-eq" style={at(5.3, 0.35)}>
+        {bars.map((h, i) => (
+          <rect key={i} x={862 + i * 9} y={344 - h} width="4" height={h} style={{ animationDelay: `${-(i * 0.13) % 0.9}s` }} />
+        ))}
+      </g>
+
+      {/* labels, one per hour */}
+      {[
+        [W.l, W.t - 14],
+        [614, 632],
+        [640, 500],
+        [560, 238],
+        [740, 458],
+        [862, 266],
+        [742, 458],
+      ].map(([x, y], i) => (
+        <text key={i} className={"ab-tag ab-tag--" + i} x={x} y={y} style={at(i + 0.35, 0.2)}>
+          {TAGS[i]}
+        </text>
+      ))}
+      <text className="ab-tag ab-vp-t" x={VP.x + 14} y={VP.y - 10} style={at(0.1, 0.2)}>
+        Vanishing point
+      </text>
+    </svg>
+  );
+}
+
+function Night() {
+  const ref = useRef<HTMLDivElement>(null);
+  const stageRef = useRef<HTMLDivElement>(null);
+  const clockRef = useRef<HTMLSpanElement>(null);
+  const [step, setStep] = useState(0);
+  const [still, setStill] = useState(false);
+
+  useEffect(() => {
+    const reduce = window.matchMedia("(prefers-reduced-motion: reduce)").matches;
+    const sec = ref.current!, stage = stageRef.current!;
+    const put = (p: number) => {
+      stage.style.setProperty("--p", p.toFixed(3));
+      const s = Math.min(6, Math.floor(p));
+      setStep((o) => (o === s ? o : s));
+      const mins = 22 * 60 + Math.min(6, p) * 60;
+      const m = Math.round(mins / 5) * 5;
+      if (clockRef.current) clockRef.current.textContent = `${String(Math.floor(m / 60) % 24).padStart(2, "0")}:${String(m % 60).padStart(2, "0")}`;
+    };
+    if (reduce) {
+      setStill(true);
+      put(7);
+      return;
+    }
+    let raf = 0;
+    const read = () => {
+      raf = 0;
+      const r = sec.getBoundingClientRect();
+      const span = r.height - window.innerHeight;
+      const p = span > 0 ? Math.max(0, Math.min(1, -r.top / span)) * 7 : 7;
+      put(p);
+    };
+    const kick = () => {
+      if (!raf) raf = requestAnimationFrame(read);
+    };
+    read();
+    window.addEventListener("scroll", kick, { passive: true });
+    window.addEventListener("resize", kick);
+    return () => {
+      cancelAnimationFrame(raf);
+      window.removeEventListener("scroll", kick);
+      window.removeEventListener("resize", kick);
+    };
+  }, []);
+
+  return (
+    <div ref={ref} className={"lns-ab__night" + (still ? " is-still" : "")}>
+      <div ref={stageRef} className="lns-ab__stage">
+        <Room />
+        <div className="lns-ab__hud">
+          <span className="lns-ab__eyebrow">{NIGHT_EYEBROW}</span>
+          <span className="lns-ab__clock">
+            <span ref={clockRef}>22:00</span>
+            <small>Accra · GMT</small>
+          </span>
+        </div>
+        <div className="lns-ab__caps" aria-live="polite">
+          {STEPS.map(([t, line], i) => (
+            <div key={i} className={"lns-ab__cap" + (i === step ? " is-on" : "")} aria-hidden={i !== step}>
+              <span className="lns-ab__count">
+                <b>{String(i + 1).padStart(2, "0")}</b>
+                <i />
+                {String(STEPS.length).padStart(2, "0")}
+              </span>
+              <h3>{t}</h3>
+              <p>{line}</p>
+              {i === STEPS.length - 1 && (
+                <button type="button" className="lns-ab__btn" onClick={() => openContactOverlay()} tabIndex={i === step ? 0 : -1}>
+                  {CTA}
+                  <span className="lns-ab__go">
+                    <Arrow />
+                  </span>
+                </button>
+              )}
+            </div>
+          ))}
+        </div>
+        <div className="lns-ab__dots" aria-hidden="true">
+          {STEPS.map((_, i) => (
+            <i key={i} className={i <= step ? "is-on" : ""} />
+          ))}
+        </div>
+      </div>
+    </div>
+  );
+}
+
+function Road() {
+  const ref = useRef<HTMLOListElement>(null);
+  useEffect(() => {
+    const el = ref.current!;
+    const reduce = window.matchMedia("(prefers-reduced-motion: reduce)").matches;
+    let raf = 0;
+    const read = () => {
+      raf = 0;
+      const r = el.getBoundingClientRect();
+      const line = window.innerHeight * 0.6;
+      const f = reduce ? 1 : Math.max(0, Math.min(1, (line - r.top) / r.height));
+      el.style.setProperty("--f", f.toFixed(3));
+      el.querySelectorAll<HTMLElement>(".lns-ab__stop").forEach((li) => {
+        li.classList.toggle("is-past", reduce || li.getBoundingClientRect().top + 14 < line);
+      });
+    };
+    const kick = () => {
+      if (!raf) raf = requestAnimationFrame(read);
+    };
+    read();
+    window.addEventListener("scroll", kick, { passive: true });
+    window.addEventListener("resize", kick);
+    return () => {
+      cancelAnimationFrame(raf);
+      window.removeEventListener("scroll", kick);
+      window.removeEventListener("resize", kick);
+    };
+  }, []);
+  return (
+    <div className="lns-ab__road">
+      <h2 className="lns-ab__h">{ROAD_TITLE}</h2>
+      <ol ref={ref} className="lns-ab__line">
+        {TIMELINE.map((t, i) => (
+          <li key={i} className="lns-ab__stop">
+            <span className="lns-ab__year">{t.year}</span>
+            <div>
+              <h3>{t.title}</h3>
+              {t.where && <em>{t.where}</em>}
+              <p>{t.text}</p>
+            </div>
+          </li>
+        ))}
+        <li className="lns-ab__stop lns-ab__stop--next">
+          <span className="lns-ab__year">Now</span>
+          <div>
+            <h3>{NEXT}</h3>
+            <button type="button" className="lns-ab__btn" onClick={() => openContactOverlay()}>
+              {CTA}
+              <span className="lns-ab__go">
+                <Arrow />
+              </span>
+            </button>
+          </div>
+        </li>
+      </ol>
+      {CERTS.length > 0 && (
+        <div className="lns-ab__certs">
+          <span className="lns-ab__eyebrow">{CERTS_TITLE}</span>
+          <ul>
+            {CERTS.map(([c, from], i) => (
+              <li key={i}>
+                <b>{c}</b>
+                {from && <em>{from}</em>}
+              </li>
+            ))}
+          </ul>
+        </div>
+      )}
+    </div>
+  );
+}
+
+const RULE_ART = [
+  // you talk to the builder: the long way round gets crossed out, a straight line takes over
+  <svg viewBox="0 0 200 120" key="0">
+    <path className="r-mute" d="M30 60L70 22L110 92L170 60" pathLength={1} />
+    <circle className="r-mute-dot" cx="70" cy="22" r="5" />
+    <circle className="r-mute-dot" cx="110" cy="92" r="5" />
+    <path className="r-x" d="M82 40L98 72M98 40L82 72" pathLength={1} />
+    <path className="r-red" d="M30 60H170" pathLength={1} />
+    <circle className="r-node" cx="30" cy="60" r="8" />
+    <circle className="r-node r-node--red" cx="170" cy="60" r="8" />
+  </svg>,
+  // phones first: blocks stack into a phone
+  <svg viewBox="0 0 200 120" key="1">
+    <path className="r-ink" d="M78 8h44a8 8 0 0 1 8 8v88a8 8 0 0 1 -8 8h-44a8 8 0 0 1 -8 -8v-88a8 8 0 0 1 8 -8z" pathLength={1} />
+    <rect className="r-blk r-blk--red" x="80" y="22" width="26" height="6" rx="3" />
+    <rect className="r-blk" x="80" y="36" width="40" height="22" rx="3" />
+    <rect className="r-blk" x="80" y="64" width="40" height="8" rx="3" />
+    <rect className="r-blk" x="80" y="78" width="32" height="8" rx="3" />
+    <rect className="r-blk r-blk--red" x="80" y="94" width="22" height="8" rx="4" />
+  </svg>,
+  // not a template: a grid of the same, one becomes yours
+  <svg viewBox="0 0 200 120" key="2">
+    {Array.from({ length: 15 }, (_, i) => {
+      const x = 46 + (i % 5) * 24, y = 24 + Math.floor(i / 5) * 26;
+      return i === 7 ? (
+        <circle key={i} className="r-own" cx={x + 8} cy={y + 8} r="11" />
+      ) : (
+        <rect key={i} className="r-cell" x={x} y={y} width="16" height="16" rx="2" style={{ ["--i" as any]: i } as React.CSSProperties} />
+      );
+    })}
+  </svg>,
+  // yours to keep: a key draws itself
+  <svg viewBox="0 0 200 120" key="3">
+    <path className="r-ink" d="M52 60a20 20 0 1 0 40 0a20 20 0 1 0 -40 0" pathLength={1} />
+    <path className="r-red" d="M92 60H156V76M140 60V72" pathLength={1} />
+    <circle className="r-node r-node--red" cx="72" cy="60" r="5" />
+  </svg>,
+];
+
+function Rules() {
+  const ref = useRef<HTMLDivElement>(null);
+  useEffect(() => {
+    const cards = ref.current!.querySelectorAll<HTMLElement>(".lns-ab__rule");
+    if (!("IntersectionObserver" in window)) {
+      cards.forEach((c) => c.classList.add("is-in"));
+      return;
+    }
+    const io = new IntersectionObserver(
+      (es) =>
+        es.forEach((e) => {
+          if (e.isIntersecting) {
+            e.target.classList.add("is-in");
+            io.unobserve(e.target);
+          }
+        }),
+      { threshold: 0.45 }
+    );
+    cards.forEach((c) => io.observe(c));
+    return () => io.disconnect();
+  }, []);
+  return (
+    <div className="lns-ab__rules-wrap">
+      <h2 className="lns-ab__h">{RULES_TITLE}</h2>
+      <div ref={ref} className="lns-ab__rules">
+        {RULES.map(([t, line], i) => (
+          <article key={i} className="lns-ab__rule">
+            <div className="lns-ab__art" aria-hidden="true">
+              {RULE_ART[i % RULE_ART.length]}
+            </div>
+            <span className="lns-ab__num">{String(i + 1).padStart(2, "0")}</span>
+            <h3>{t}</h3>
+            <p>{line}</p>
+          </article>
+        ))}
+      </div>
+    </div>
+  );
+}
+
+export default function AboutStudio() {
+  return (
+    <section id="about" className="lns-ab" aria-label="About">
+      <style>{CSS}</style>
+      <div className="lns-ab__intro">
+        <span className="lns-ab__eyebrow">The studio</span>
+        <div className="lns-ab__head">
+          <h2 className="lns-ab__name">{NAME}.</h2>
+          <p className="lns-ab__lead">{LEAD}</p>
+        </div>
+        <div className="lns-ab__body">
+          <figure className="lns-ab__photo">
+            {PHOTO ? (
+              <img src={PHOTO} alt={PHOTO_ALT} loading="lazy" />
+            ) : (
+              <div className="lns-ab__ph" aria-hidden="true">
+                <i />
+                <i />
+                <span>Your photo · 4:5</span>
+              </div>
+            )}
+          </figure>
+          <div className="lns-ab__story">
+            {STORY.map((s, i) => (
+              <p key={i}>{s}</p>
+            ))}
+            <span className="lns-ab__sig">{SIGNATURE}</span>
+          </div>
+        </div>
+      </div>
+      <Night />
+      <Road />
+      <Rules />
+    </section>
+  );
+}
+
+const CSS = `
+.lns-ab{--ab-ink:#28272a;--ab-muted:rgba(40,39,42,.62);--ab-faint:rgba(40,39,42,.16);--ab-red:#ed1d04;--ab-paper:#cdc9c3;
+  --lns-display:inherit;--lns-body:inherit;--e:cubic-bezier(.65,0,.35,1);
+  position:relative;color:var(--ab-ink);font-family:var(--lns-body, system-ui, sans-serif)}
+.lns-ab *{box-sizing:border-box}
+.lns-ab h2,.lns-ab h3,.lns-ab p,.lns-ab figure,.lns-ab ol{margin:0}
+.lns-ab__eyebrow{display:inline-flex;align-items:center;gap:10px;font:500 11px/1 ui-monospace,SFMono-Regular,Menlo,Consolas,monospace;letter-spacing:.14em;text-transform:uppercase;color:var(--ab-muted)}
+.lns-ab__eyebrow::before{content:"";width:28px;height:1px;background:var(--ab-red)}
+.lns-ab__h{font-family:var(--lns-display, system-ui, sans-serif);font-weight:800;font-size:clamp(36px,5.4vw,76px);line-height:.95;letter-spacing:-.01em}
+
+/* intro */
+.lns-ab__intro{padding:clamp(48px,8vw,120px) clamp(16px,4vw,56px) clamp(40px,6vw,88px)}
+.lns-ab__head{display:grid;grid-template-columns:1.3fr 1fr;gap:clamp(20px,4vw,64px);align-items:end;margin-top:18px}
+.lns-ab__name{font-family:var(--lns-display, system-ui, sans-serif);font-weight:800;font-size:clamp(64px,12vw,184px);line-height:.85;letter-spacing:-.02em}
+.lns-ab__lead{font-size:clamp(17px,1.5vw,21px);line-height:1.4;color:var(--ab-muted);max-width:34ch}
+.lns-ab__body{display:grid;grid-template-columns:minmax(0,.8fr) minmax(0,1.2fr);gap:clamp(24px,4vw,64px);margin-top:clamp(32px,5vw,72px);align-items:start}
+.lns-ab__photo{position:relative;aspect-ratio:4/5;border-radius:20px;overflow:hidden;background:rgba(40,39,42,.06)}
+.lns-ab__photo img{width:100%;height:100%;object-fit:cover;display:block}
+.lns-ab__ph{position:absolute;inset:0;border:1px solid rgba(237,29,4,.5);border-radius:20px}
+.lns-ab__ph i{position:absolute;background:rgba(237,29,4,.35)}
+.lns-ab__ph i:nth-child(1){left:0;right:0;top:50%;height:1px}
+.lns-ab__ph i:nth-child(2){top:0;bottom:0;left:50%;width:1px}
+.lns-ab__ph span{position:absolute;left:12px;top:12px;padding:4px 7px;border-radius:4px;background:var(--ab-red);color:#fff;font:500 10px/1 ui-monospace,SFMono-Regular,Menlo,Consolas,monospace;letter-spacing:.06em}
+.lns-ab__story{display:grid;gap:18px;max-width:58ch;font-size:clamp(16px,1.25vw,19px);line-height:1.55}
+.lns-ab__sig{margin-top:8px;font:13px/1 ui-monospace,SFMono-Regular,Menlo,Consolas,monospace;color:var(--ab-muted)}
+
+/* a night in the studio */
+.lns-ab__night{position:relative;height:640vh}
+.lns-ab__night.is-still{height:auto}
+.lns-ab__stage{--p:0;position:sticky;top:0;height:100vh;height:100svh;overflow:hidden;border-top:1px solid var(--ab-faint);border-bottom:1px solid var(--ab-faint)}
+.lns-ab__night.is-still .lns-ab__stage{position:relative}
+.lns-ab__room{position:absolute;inset:0;width:100%;height:100%;display:block}
+.lns-ab__room [style*="--a"]{--k:clamp(0, calc((var(--p) - var(--a)) / var(--d)), 1)}
+.ab-ln{fill:none;stroke:var(--ab-ink);stroke-width:1.4;stroke-linecap:round;stroke-linejoin:round;stroke-dasharray:1 1;stroke-dashoffset:calc(1 - var(--k));vector-effect:non-scaling-stroke}
+.ab-faint{stroke:var(--ab-faint)}
+.ab-red{stroke:var(--ab-red);opacity:.5}
+.ab-thin{stroke-width:3}
+.ab-vp{fill:var(--ab-red);opacity:var(--k);transform-box:fill-box;transform-origin:center;transform:scale(calc(.4 + var(--k) * .6))}
+.ab-tag{font:500 13px ui-monospace,SFMono-Regular,Menlo,Consolas,monospace;fill:var(--ab-red);opacity:var(--k)}
+.ab-tag--2{text-anchor:end}
+.ab-tag--4{opacity:calc(var(--k) * (1 - clamp(0, calc((var(--p) - 6.1) / .2), 1)))}
+.ab-cone{opacity:calc(var(--k) * (1 - .85 * clamp(0, calc((var(--p) - 6.2) / .5), 1)))}
+.ab-bulb{fill:#ffb36b;opacity:calc(var(--k) * (1 - .8 * clamp(0, calc((var(--p) - 6.2) / .5), 1)))}
+.ab-sky{fill:var(--ab-ink);opacity:var(--k)}
+.ab-dawn{opacity:var(--k)}
+.ab-city{opacity:var(--k)}
+.ab-moon{fill:#e9e4dc}
+.ab-skyline{fill:#141316}
+.ab-lit{fill:#ffb36b;animation:lnsAbLit 2.2s steps(1) infinite}
+@keyframes lnsAbLit{0%,100%{opacity:1}43%{opacity:.25}71%{opacity:.9}}
+.ab-scr{fill:#f3efe9;opacity:var(--k)}
+.ab-mark{fill:var(--ab-red);opacity:var(--k)}
+.ab-live{opacity:var(--k)}
+.ab-live__bg{fill:var(--ab-red)}
+.ab-live__dot{fill:#fff;animation:lnsAbPulse 1.4s ease-in-out infinite}
+.ab-live__t{font:700 15px var(--lns-display, system-ui, sans-serif);fill:#fff}
+@keyframes lnsAbPulse{50%{opacity:.3}}
+.ab-eq{opacity:calc(var(--k) * .85)}
+.ab-eq rect{fill:var(--ab-red);transform-box:fill-box;transform-origin:50% 100%;animation:lnsAbEq .9s ease-in-out infinite alternate}
+@keyframes lnsAbEq{from{transform:scaleY(.25)}to{transform:scaleY(1)}}
+
+.lns-ab__hud{position:absolute;left:clamp(16px,4vw,56px);right:clamp(16px,4vw,56px);top:clamp(76px,11vh,104px);display:flex;justify-content:space-between;align-items:flex-start;gap:16px;pointer-events:none}
+.lns-ab__clock{display:grid;justify-items:end;gap:6px;font-family:var(--lns-display, system-ui, sans-serif);font-weight:700;font-size:clamp(40px,6vw,88px);line-height:.85;font-variant-numeric:tabular-nums;color:rgba(40,39,42,.22)}
+.lns-ab__clock small{font:500 11px/1 ui-monospace,SFMono-Regular,Menlo,Consolas,monospace;letter-spacing:.12em;text-transform:uppercase;color:var(--ab-muted)}
+.lns-ab__caps{position:absolute;left:clamp(16px,4vw,56px);bottom:clamp(24px,6vh,56px);width:min(460px,calc(100% - 32px));display:grid}
+.lns-ab__cap{grid-area:1/1;align-self:end;opacity:0;transform:translateY(14px);transition:opacity .35s,transform .45s var(--e);pointer-events:none}
+.lns-ab__cap.is-on{opacity:1;transform:none;pointer-events:auto}
+.lns-ab__count{display:flex;align-items:center;gap:10px;font:500 12px/1 ui-monospace,SFMono-Regular,Menlo,Consolas,monospace;color:var(--ab-muted);margin-bottom:12px}
+.lns-ab__count b{font-weight:500;color:var(--ab-red)}
+.lns-ab__count i{width:28px;height:1px;background:var(--ab-muted)}
+.lns-ab__cap h3{font-family:var(--lns-display, system-ui, sans-serif);font-weight:800;font-size:clamp(32px,3.6vw,52px);line-height:1}
+.lns-ab__cap p{margin-top:10px;font-size:clamp(15px,1.2vw,18px);line-height:1.45;color:var(--ab-muted);max-width:40ch}
+.lns-ab__cap .lns-ab__btn{margin-top:18px}
+.lns-ab__dots{position:absolute;right:clamp(16px,4vw,56px);bottom:clamp(28px,6vh,60px);display:flex;gap:6px}
+.lns-ab__dots i{width:8px;height:8px;border-radius:50%;border:1px solid var(--ab-muted);transition:background .3s,border-color .3s}
+.lns-ab__dots i.is-on{background:var(--ab-red);border-color:var(--ab-red)}
+
+/* CTA: red circle, arrow turns 45° */
+.lns-ab__btn{display:inline-flex;align-items:center;gap:14px;padding:6px 6px 6px 22px;border:0;border-radius:999px;background:var(--ab-ink);color:#f3efe9;
+  font:600 16px/1 var(--lns-body, system-ui, sans-serif);cursor:pointer;transition:background .25s}
+.lns-ab__go{display:grid;place-items:center;width:40px;height:40px;border-radius:50%;background:var(--ab-red);color:#fff;transition:transform .35s var(--e)}
+.lns-ab__go svg{width:16px;height:16px;fill:none;stroke:currentColor;stroke-width:2;stroke-linecap:round;stroke-linejoin:round}
+.lns-ab__btn:hover{background:#000}
+.lns-ab__btn:hover .lns-ab__go,.lns-ab__btn:focus-visible .lns-ab__go{transform:rotate(45deg)}
+.lns-ab__btn:focus-visible{outline:2px solid var(--ab-red);outline-offset:4px}
+
+/* the road so far */
+.lns-ab__road{padding:clamp(64px,9vw,140px) clamp(16px,4vw,56px) clamp(40px,6vw,80px)}
+.lns-ab .lns-ab__line{--f:0;position:relative;list-style:none;padding:0;margin-top:clamp(32px,5vw,64px);max-width:880px}
+.lns-ab__line::before,.lns-ab__line::after{content:"";position:absolute;left:5px;top:10px;bottom:10px;width:1px;background:var(--ab-faint)}
+.lns-ab__line::after{background:var(--ab-red);transform-origin:top;transform:scaleY(var(--f))}
+.lns-ab__stop{position:relative;display:grid;grid-template-columns:110px 1fr;gap:16px;padding:0 0 clamp(32px,4vw,52px) 36px}
+.lns-ab__stop::before{content:"";position:absolute;left:0;top:6px;width:11px;height:11px;border-radius:50%;background:var(--ab-paper);border:1px solid var(--ab-muted);z-index:1;transition:background .3s,border-color .3s,transform .3s}
+.lns-ab__stop.is-past::before{background:var(--ab-red);border-color:var(--ab-red);transform:scale(1.2)}
+.lns-ab__year{font-family:var(--lns-display, system-ui, sans-serif);font-weight:700;font-size:22px;line-height:1;font-variant-numeric:tabular-nums}
+.lns-ab__stop h3{font-family:var(--lns-display, system-ui, sans-serif);font-weight:700;font-size:clamp(20px,1.8vw,26px);line-height:1.1}
+.lns-ab__stop em{display:block;margin-top:6px;font:normal 12px/1.2 ui-monospace,SFMono-Regular,Menlo,Consolas,monospace;color:var(--ab-muted)}
+.lns-ab__stop p{margin-top:10px;max-width:52ch;line-height:1.5;color:var(--ab-muted)}
+.lns-ab__stop--next{padding-bottom:0}
+.lns-ab__stop--next .lns-ab__year{color:var(--ab-red)}
+.lns-ab__stop--next h3{font-size:clamp(26px,2.6vw,38px);font-weight:800}
+.lns-ab__stop--next .lns-ab__btn{margin-top:18px}
+
+.lns-ab__certs{margin-top:clamp(48px,6vw,80px);max-width:880px}
+.lns-ab .lns-ab__certs ul{list-style:none;margin:18px 0 0;padding:0;display:grid;grid-template-columns:repeat(auto-fill,minmax(240px,1fr));gap:10px}
+.lns-ab__certs li{display:grid;gap:6px;padding:14px 16px;border:1px solid var(--ab-faint);border-radius:14px;transition:border-color .3s}
+.lns-ab__certs li:hover{border-color:rgba(237,29,4,.5)}
+.lns-ab__certs b{font-weight:600;font-size:15px;line-height:1.3}
+.lns-ab__certs em{font:normal 12px/1.2 ui-monospace,SFMono-Regular,Menlo,Consolas,monospace;color:var(--ab-red)}
+
+/* what I stick to */
+.lns-ab__rules-wrap{padding:clamp(48px,7vw,110px) clamp(16px,4vw,56px) clamp(56px,8vw,120px)}
+.lns-ab__rules{display:grid;grid-template-columns:repeat(4,minmax(0,1fr));gap:clamp(12px,1.6vw,24px);margin-top:clamp(28px,4vw,56px)}
+.lns-ab__rule{position:relative;padding:20px 20px 24px;border-radius:20px;border:1px solid var(--ab-faint);transition:border-color .3s}
+.lns-ab__rule:hover{border-color:rgba(237,29,4,.5)}
+.lns-ab__art{height:120px;margin:-4px -4px 18px;border-radius:12px;background:rgba(40,39,42,.05)}
+.lns-ab__art svg{display:block;width:100%;height:100%;overflow:visible}
+.lns-ab__num{font:500 12px/1 ui-monospace,SFMono-Regular,Menlo,Consolas,monospace;color:var(--ab-red)}
+.lns-ab__rule h3{margin-top:10px;font-family:var(--lns-display, system-ui, sans-serif);font-weight:700;font-size:clamp(20px,1.6vw,24px);line-height:1.1}
+.lns-ab__rule p{margin-top:10px;font-size:15px;line-height:1.5;color:var(--ab-muted)}
+.lns-ab__art path,.lns-ab__art circle,.lns-ab__art rect{vector-effect:non-scaling-stroke}
+.r-ink,.r-red,.r-mute,.r-x{fill:none;stroke-width:2;stroke-linecap:round;stroke-linejoin:round;stroke-dasharray:1 1;stroke-dashoffset:1}
+.r-ink{stroke:var(--ab-ink)}
+.r-red{stroke:var(--ab-red);stroke-width:3}
+.r-mute{stroke:rgba(40,39,42,.35);stroke-dasharray:1 1}
+.r-x{stroke:var(--ab-red)}
+.r-mute-dot{fill:rgba(40,39,42,.3);opacity:0}
+.r-node{fill:var(--ab-ink);opacity:0;transform-box:fill-box;transform-origin:center;transform:scale(.3)}
+.r-node--red{fill:var(--ab-red)}
+.r-blk{fill:rgba(40,39,42,.28);opacity:0;transform:translateY(-14px)}
+.r-blk--red{fill:var(--ab-red)}
+.r-cell{fill:rgba(40,39,42,.2);opacity:0}
+.r-own{fill:var(--ab-red);opacity:0;transform-box:fill-box;transform-origin:center;transform:scale(0)}
+.is-in .r-mute{animation:lnsAbDash .6s var(--e) forwards,lnsAbFade .4s 1.3s forwards}
+.is-in .r-mute-dot{animation:lnsAbIn .3s .2s forwards,lnsAbFade .4s 1.3s forwards}
+.is-in .r-x{animation:lnsAbDash .35s .8s var(--e) forwards}
+.is-in .r-red{animation:lnsAbDash .7s 1.1s var(--e) forwards}
+.is-in .r-ink{animation:lnsAbDash .8s var(--e) forwards}
+.is-in .r-node{animation:lnsAbPop .4s var(--e) forwards}
+.is-in .r-node--red{animation-delay:1.6s}
+.is-in .r-blk{animation:lnsAbDrop .45s var(--e) forwards}
+.is-in .r-blk:nth-of-type(1){animation-delay:.7s}.is-in .r-blk:nth-of-type(2){animation-delay:.85s}.is-in .r-blk:nth-of-type(3){animation-delay:1s}
+.is-in .r-blk:nth-of-type(4){animation-delay:1.15s}.is-in .r-blk:nth-of-type(5){animation-delay:1.3s}
+.is-in .r-cell{animation:lnsAbIn .25s calc(var(--i) * .05s) forwards}
+.is-in .r-own{animation:lnsAbPop .5s 1s var(--e) forwards}
+.lns-ab__rule:nth-child(4).is-in .r-red{animation-delay:.7s}
+.lns-ab__rule:nth-child(4).is-in .r-node--red{animation-delay:.3s}
+@keyframes lnsAbDash{to{stroke-dashoffset:0}}
+@keyframes lnsAbIn{to{opacity:1}}
+@keyframes lnsAbFade{to{opacity:.15}}
+@keyframes lnsAbPop{to{opacity:1;transform:scale(1)}}
+@keyframes lnsAbDrop{to{opacity:1;transform:none}}
+
+@media (max-width:1000px){.lns-ab__rules{grid-template-columns:repeat(2,minmax(0,1fr))}}
+@media (max-width:720px){
+  .lns-ab__head,.lns-ab__body{grid-template-columns:1fr}
+  .lns-ab__photo{max-width:420px}
+  .lns-ab__night{height:560vh}
+  .lns-ab__room{inset:auto 0 auto 0;top:16%;height:52%}
+  .ab-tag{font-size:22px}
+  .ab-vp-t,.ab-tag--0,.ab-tag--3{display:none}
+  .lns-ab__clock{font-size:44px}
+  .lns-ab__dots{bottom:auto;top:calc(16% + 52% + 8px)}
+  .lns-ab__hud{top:64px}
+  .lns-ab__stop{grid-template-columns:1fr;gap:6px}
+  .lns-ab__rules{grid-template-columns:1fr}
+}
+@media (prefers-reduced-motion:reduce){
+  .lns-ab *{animation:none!important;transition:none!important}
+  .r-ink,.r-red,.r-mute,.r-x{stroke-dashoffset:0}
+  .r-mute-dot,.r-node,.r-blk,.r-cell,.r-own{opacity:1;transform:none}
+}
+`;

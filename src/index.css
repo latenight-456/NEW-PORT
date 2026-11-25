@@ -1,1 +1,142 @@
 @import "tailwindcss";
+
+/* Rounded numerals site-wide (Fredoka). unicode-range means this font is ONLY used for 0-9 and %,
+   so every other character keeps your existing fonts. */
+@font-face{
+  font-family:"LNS Numerals";
+  src:url("https://cdn.jsdelivr.net/npm/@fontsource/fredoka@5.2.10/files/fredoka-latin-400-normal.woff2") format("woff2");
+  font-weight:100 500;font-style:normal;font-display:swap;unicode-range:U+0030-0039,U+0025;
+}
+@font-face{
+  font-family:"LNS Numerals";
+  src:url("https://cdn.jsdelivr.net/npm/@fontsource/fredoka@5.2.10/files/fredoka-latin-600-normal.woff2") format("woff2");
+  font-weight:501 900;font-style:normal;font-display:swap;unicode-range:U+0030-0039,U+0025;
+}
+
+:root {
+  --lns-display: "LNS Numerals", "Blackburn", system-ui, sans-serif;
+  --lns-body: "LNS Numerals", Inter, system-ui, -apple-system, sans-serif;
+}
+
+html {
+  scroll-behavior: smooth;
+}
+
+body {
+  margin: 0;
+  padding: 0;
+  background-color: #292929;
+  font-family: "LNS Numerals", Inter, system-ui, -apple-system, sans-serif;
+  transition: background-color .3s ease;
+}
+
+.linen {
+  background-color: #d8d5ce;
+  background-image:
+    /* irregular grain */
+    url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='240' height='240'%3E%3Cfilter id='n' x='0' y='0' width='100%25' height='100%25'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.9' numOctaves='3' stitchTiles='stitch'/%3E%3CfeColorMatrix values='0 0 0 0 0.16 0 0 0 0 0.15 0 0 0 0 0.13 0.9 0 0 0 -0.3'/%3E%3C/filter%3E%3Crect width='240' height='240' filter='url(%23n)' opacity='0.5'/%3E%3C/svg%3E"),
+    /* horizontal threads */
+    repeating-linear-gradient(0deg,
+      rgba(41, 41, 41, 0.06) 0 1px,
+      rgba(255, 255, 255, 0.10) 1px 2px,
+      transparent 2px 4px),
+    /* vertical threads */
+    repeating-linear-gradient(90deg,
+      rgba(41, 41, 41, 0.06) 0 1px,
+      rgba(255, 255, 255, 0.10) 1px 2px,
+      transparent 2px 4px);
+  background-size: 240px 240px, 4px 4px, 4px 4px;
+}
+
+.hero-card.linen,
+.work-card.linen,
+.about-card.linen,
+.services-card.linen,
+.contact-card.linen,
+.about-page-card.linen,
+.footer-card.linen,
+.nav-card.linen {
+  background-color: var(--card-bg) !important;
+}
+
+html.dark .lns-pb {
+  --pb-paper: #292929;
+  --pb-ink: #cdc9c3;
+  --pb-muted: #9d9893;
+  --pb-line: rgba(205, 201, 195, .22);
+  --pb-keepcard: 1;
+}
+
+html.dark .lns-sp, html.dark .lns-sp__layer {
+  --sp-paper: #292929;
+  --sp-ink: #cdc9c3;
+  --sp-muted: #9d9893;
+  --sp-line: rgba(205, 201, 195, .2);
+  --sp-card: rgba(255, 255, 255, .04);
+}
+
+.lns-ab {
+  --lns-display: "LNS Numerals", "Blackburn", system-ui, sans-serif;
+  --lns-body: "LNS Numerals", Inter, system-ui, -apple-system, sans-serif;
+}
+
+html.dark .lns-ab {
+  --ab-paper: #292929;
+  --ab-ink: #cdc9c3;
+  --ab-muted: rgba(205, 201, 195, .64);
+  --ab-faint: rgba(205, 201, 195, .18);
+}
+
+html.dark .lns-ab__clock {
+  color: rgba(205, 201, 195, .24);
+}
+
+html.dark .lns-ab__stage {
+  --ab-ink: #28272a;
+  --ab-muted: rgba(40, 39, 42, .62);
+  --ab-faint: rgba(40, 39, 42, .16);
+  color: var(--ab-ink);
+}
+
+html.dark .lns-ab__stage .lns-ab__clock {
+  color: rgba(40, 39, 42, .2);
+}
+
+html.dark .lns-ab__btn {
+  background: var(--ab-ink);
+  color: #141316;
+}
+
+html.dark .lns-ab__btn:hover {
+  background: #fff;
+}
+
+html.dark .lns-ab__stage .lns-ab__btn {
+  background: #28272a;
+  color: #f3efe9;
+}
+
+html.dark .lns-ab__stage .lns-ab__btn:hover {
+  background: #000;
+}
+
+html.dark .lns-ab__photo,
+html.dark .lns-ab__art {
+  background: rgba(205, 201, 195, .06);
+}
+
+html.dark .r-mute {
+  stroke: rgba(205, 201, 195, .35);
+}
+
+html.dark .r-mute-dot {
+  fill: rgba(205, 201, 195, .3);
+}
+
+html.dark .r-blk {
+  fill: rgba(205, 201, 195, .28);
+}
+
+html.dark .r-cell {
+  fill: rgba(205, 201, 195, .22);
+}
